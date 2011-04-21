@@ -1,0 +1,1 @@
+A silly little excuse to [drop F-bombs](http://www.whatfuckingphotoshouldilookat.com/) and mess with the [Flickr API](http://www.flickr.com/services/api/).

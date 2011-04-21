@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
+  <script src="http://ajax.googleapis.com/ajax/libs/jquery/1/jquery.min.js" type="text/javascript" charset="utf-8"></script>
+  <title>What fucking photo should I look at?</title>  
+  <style type="text/css" media="screen">
+    html { height: 100%; background: url(bg_light.png);}
+    body {
+      font: normal 18px/1.5em "Baskerville", "Georgia", serif;
+      text-shadow: 0 1px 1px #fff;
+      text-align: center;
+      max-width: 960px;
+      padding: 15px 100px 50px 100px;
+      margin: 0 auto;
+    }
+    h1 { font-size: 14px; }
+    h2 { font-size: 32px; line-height: 42px; font-style: italic; font-weight: normal; }
+    h2 span { font-variant: small-caps; font-weight: normal; font-size: 38px; font-style: normal; }
+    a { color: #000; font-weight: bold; font-variant: small-caps; text-decoration: none; border-bottom: 2px solid #000; -webkit-transition-duration: .25s; }
+    img.photo { display: none; max-width: 100%; max-height: 400px; border: 10px solid #fff; -webkit-box-shadow: 0 0 10px rgba(0,0,0,.5); -moz-box-shadow: 0 0 10px rgba(0,0,0,.5); box-shadow: 0 0 10px rgba(0,0,0,.5); cursor: pointer; }
+    #photo_container { height: 450px; }
+    #flickr { font-size: 24px;}
+    #flickr:hover { background: #fff; color: #ff0066; }
+    #footer { color: #999; }
+    #footer a { font-weight: normal; border: none; font-variant: normal; font-style: italic; font-size: 21px; }
+    #footer a:hover { text-decoration: underline; }
+    #footer small,
+    #footer small a {
+      font-size: 16px;
+      color: #999;
+    }
+    #footer small a { color: #777; }
+    #footer small a:hover { color: #333; }
+  </style>
+
+</head>
+<body>
+  
+  <h2>Why not fucking look at <br /><span></span></h2>
+  <div id="photo_container"><img class="photo" src="" /></div>
+  <p><a id="flickr" href="">View on fucking Flickr &raquo;</a></p>
+  
+  <div id="footer">
+    <p>
+      <a href="#next">I don't like this fucking photo</a> //
+      <a href="http://www.flickr.com/search/?w=all&amp;q=cute+cat&amp;m=text">I fucking prefer cat photos</a>
+    </p>
+    <p>
+      <small>
+        Inspired by <a href="http://www.thefuckingweather.com/" title="The Fucking Weather">this</a>, <a href="http://whatthefuckshouldimakefordinner.com/" title="What the fuck should I make for dinner?">this</a>, and <a href="http://www.goodfuckingdesignadvice.com/" title="Good Fucking Design Advice">this</a>.  Built by <a href="http://kylefox.ca">this</a> with photos from <a href="http://www.flickr.com/explore/interesting/7days/">this</a>.
+      </small>
+    </p>
+  </div>
+  
+  <script type="text/javascript" charset="utf-8">
+  
+    (function($){
+      $.fn.shuffle = function() {
+        return this.each(function(){
+          var items = $(this).children();
+          return (items.length)
+            ? $(this).html($.shuffle(items))
+            : this;
+        });
+      }
+
+      $.shuffle = function(arr) {
+        for(
+          var j, x, i = arr.length; i;
+          j = parseInt(Math.random() * i),
+          x = arr[--i], arr[i] = arr[j], arr[j] = x
+        );
+        return arr;
+      }
+    })(jQuery);
+  
+  
+    $(document).ready(function() {
+      
+      // var API_METHOD = "http://api.flickr.com/services/rest/?&method=flickr.photosets.getPhotos&api_key=07fa11c31adbd0016eb1aa4acbc64575&photoset_id=72157624227687203&extras=url_sq,url_t,url_s,url_m,url_l&format=json&jsoncallback=?";
+      
+      // http://www.flickr.com/services/api/flickr.interestingness.getList.html  
+      var API_METHOD = "http://api.flickr.com/services/rest/?&method=flickr.interestingness.getList&api_key=4fcdec757f55e9f45713a7851f667687&extras=original_format,url_m,url_l&format=json&jsoncallback=?",
+          photos = null,
+          current = 0,
+          title = $('h2 span'),
+          image = $('img:first');
+            
+      function permalink(photo) {
+        return "http://www.flickr.com/photos/" + photo.owner + "/" + photo.id;
+      }
+            
+      function getNextPhoto() {
+        var p = photos[current];
+        current++;
+        if(current > photos.length) current = 0;
+        return p;
+      };
+      
+      function showFuckingPhoto() {
+        var photo = getNextPhoto();        
+        image.fadeOut(function() {
+          image.attr('src', photo.img.src).fadeIn();
+        });
+        title.fadeOut(function() {
+          title.text(photo.title || 'untitled').fadeIn();
+        })
+        $('#flickr').attr('href', permalink(photo));
+      };
+      
+      $('a[href="#next"],.photo').click(function(event) {
+        event.preventDefault();
+        showFuckingPhoto();
+      });
+      
+      $.getJSON(API_METHOD, function(json) {
+        photos = $.shuffle(json.photos.photo);
+        loadPhoto(0);
+        showFuckingPhoto();
+      });
+      
+      function loadPhoto(idx) {
+        var photo = photos[idx],
+            img = new Image();
+        img.onload = function() {
+          console.log("Finished loading " + idx);
+          if(idx+1 < photos.length) loadPhoto(idx+1);
+        };
+        console.log("Loading " + idx);
+        img.src = photo.url_l || photo.url_m;
+        photo.img = img;
+      };
+      
+    });
+  </script>
+  
+  
+  <script type="text/javascript">
+
+    var _gaq = _gaq || [];
+    _gaq.push(['_setAccount', 'UA-1701128-20']);
+    _gaq.push(['_trackPageview']);
+
+    (function() {
+      var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+      ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+      var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+    })();
+
+  </script>
+</body>
+</html>
